@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequential Animations</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .animation-box {
+            width: 100px;
+            height: 100px;
+            background-color: #3498db;
+            margin: 20px auto;
+            position: relative;
+            left: 0;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        .sequence-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .current-step {
+            font-weight: bold;
+            color: #2980b9;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sequential Animations</h1>
+        <div class="animation-box" id="box"></div>
+        
+        <div class="controls">
+            <button id="start-btn">Start Animation Sequence</button>
+            <button id="reset-btn">Reset</button>
+        </div>
+        
+        <div class="sequence-info">
+            <h3>Animation Sequence:</h3>
+            <ol>
+                <li>Move right (using setTimeout)</li>
+                <li>Change color to green (using Promises)</li>
+                <li>Rotate 360° (using async/await)</li>
+                <li>Scale up (using Promise chaining)</li>
+                <li>Return to original state</li>
+            </ol>
+            <p class="current-step" id="step-display">Click "Start Animation Sequence" to begin</p>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const box = document.getElementById('box');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const stepDisplay = document.getElementById('step-display');
+
+        // Animation functions - each returns a Promise
+        function moveRight() {
+            return new Promise(resolve => {
+                stepDisplay.textContent = "Step 1: Moving right (setTimeout)";
+                let position = 0;
+                const interval = setInterval(() => {
+                    position += 5;
+                    box.style.transform = `translateX(${position}px)`;
+                    if (position >= 200) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            resolve();
+                        }, 500); // Short pause before next animation
+                    }
+                }, 30);
+            });
+        }
+
+        function changeColor() {
+            return new Promise(resolve => {
+                stepDisplay.textContent = "Step 2: Changing color (Promises)";
+                box.style.backgroundColor = '#2ecc71'; // Green color
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            });
+        }
+
+        function rotate() {
+            return new Promise(resolve => {
+                stepDisplay.textContent = "Step 3: Rotating (async/await)";
+                box.style.transition = 'transform 1.5s ease';
+                box.style.transform = 'translateX(200px) rotate(360deg)';
+                setTimeout(() => {
+                    resolve();
+                }, 1500);
+            });
+        }
+
+        function scaleUp() {
+            return new Promise(resolve => {
+                stepDisplay.textContent = "Step 4: Scaling up (Promise chaining)";
+                box.style.transition = 'transform 1s ease, scale 1s ease';
+                box.style.transform = 'translateX(200px) rotate(360deg) scale(1.5)';
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            });
+        }
+
+        function resetBox() {
+            return new Promise(resolve => {
+                stepDisplay.textContent = "Step 5: Returning to original state";
+                box.style.transition = 'all 1s ease';
+                box.style.transform = 'translateX(0) rotate(0) scale(1)';
+                box.style.backgroundColor = '#3498db';
+                setTimeout(() => {
+                    stepDisplay.textContent = "Animation sequence completed!";
+                    resolve();
+                }, 1000);
+            });
+        }
+
+        // Main function to run animations in sequence using async/await
+        async function runAnimationSequence() {
+            startBtn.disabled = true;
+            resetBtn.disabled = true;
+            
+            try {
+                // Method 1: Using basic Promise chaining
+                await moveRight();
+                
+                // Method 2: Using Promise
+                await changeColor();
+                
+                // Method 3: Using async/await
+                await rotate();
+                
+                // Method 4: Promise chaining
+                await scaleUp();
+                
+                // Reset to original state
+                await resetBox();
+                
+            } catch (error) {
+                console.error("Animation error:", error);
+                stepDisplay.textContent = "Error in animation sequence!";
+            } finally {
+                startBtn.disabled = false;
+                resetBtn.disabled = false;
+            }
+        }
+
+        // Reset function
+        function resetAnimation() {
+            box.style.transition = 'all 0.3s ease';
+            box.style.transform = 'translateX(0) rotate(0) scale(1)';
+            box.style.backgroundColor = '#3498db';
+            stepDisplay.textContent = "Click \"Start Animation Sequence\" to begin";
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', runAnimationSequence);
+        resetBtn.addEventListener('click', resetAnimation);
+    </script>
+</body>
+</html>
